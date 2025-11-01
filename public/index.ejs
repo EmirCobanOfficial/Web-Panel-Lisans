@@ -32,12 +32,6 @@
           <a href="#" class="nav-link" data-page="invites-page">
             <i class="fa-solid fa-envelope-open-text fa-fw"></i> Davetler
           </a>
-          <a href="#" class="nav-link" data-page="moderation-plugins-page">
-            <i class="fa-solid fa-shield-halved fa-fw"></i> Moderasyon
-          </a>
-          <a href="#" class="nav-link" data-page="management-plugins-page">
-            <i class="fa-solid fa-users-gear fa-fw"></i> Yönetim
-          </a>
           <a href="#" class="nav-link" data-page="roles-page">
             <i class="fa-solid fa-tags fa-fw"></i> Rol Yönetimi
           </a>
@@ -50,8 +44,14 @@
           <a href="#" class="nav-link" data-page="mod-log-page">
             <i class="fa-solid fa-gavel fa-fw"></i> Moderasyon Logları
           </a>
+          <a href="#" class="nav-link" data-page="custom-commands-page">
+            <i class="fa-solid fa-terminal fa-fw"></i> Özel Komutlar
+          </a>
           <a href="#" class="nav-link" data-page="backups-page">
             <i class="fa-solid fa-floppy-disk fa-fw"></i> Yedekleme
+          </a>
+          <a href="#" class="nav-link" data-page="plugins-page">
+            <i class="fa-solid fa-puzzle-piece fa-fw"></i> Eklentiler
           </a>
         </nav>
         <div class="sidebar-footer">
@@ -94,543 +94,607 @@
           </div>
         </div>
 
-        <!-- Page: Moderation Plugins -->
-        <div
-          class="page-content"
-          id="moderation-plugins-page"
-          style="display: none"
-        >
-          <header class="main-header">
-            <h2>🛡️ Moderasyon & Güvenlik</h2>
-            <div class="header-controls">
-              <button class="import-settings-btn header-action-btn">
-                <i class="fa-solid fa-upload"></i> Ayarları İçe Aktar
-              </button>
-              <button class="export-settings-btn header-action-btn">
-                <i class="fa-solid fa-download"></i> Ayarları Dışa Aktar
-              </button>
-              <button class="reset-all-settings-btn header-action-btn danger">
-                <i class="fa-solid fa-trash-arrow-up"></i> Tüm Ayarları Sıfırla
-              </button>
-            </div>
-          </header>
-          <div class="plugins-grid" id="moderation-plugins">
-            <div class="plugin-card" data-module="moderation">
-              <div class="plugin-header">
-                <i class="fa-solid fa-shield-halved"></i>
-                <h3>Moderation</h3>
-                <i class="fa-solid fa-chevron-down collapse-icon"></i>
-                <label class="switch" style="margin-left: auto"
-                  ><input
-                    type="checkbox"
-                    data-setting="enabled"
-                    class="enable-toggle" /><span class="slider"></span
-                ></label>
+        <!-- Page: Plugins (Birleştirilmiş) -->
+        <div class="page-content" id="plugins-page" style="display: none">
+          <!-- =================================================================
+               MODERASYON EKLENTİLERİ
+               ================================================================= -->          
+          <div class="plugins-grid-container">
+            <header class="main-header">
+              <h2>🛡️ Moderasyon & Güvenlik</h2>
+              <div class="header-controls">
+                <button class="import-settings-btn header-action-btn">
+                  <i class="fa-solid fa-upload"></i> Ayarları İçe Aktar
+                </button>
+                <button class="export-settings-btn header-action-btn">
+                  <i class="fa-solid fa-download"></i> Ayarları Dışa Aktar
+                </button>
+                <button class="reset-all-settings-btn header-action-btn danger">
+                  <i class="fa-solid fa-trash-arrow-up"></i> Tüm Ayarları Sıfırla
+                </button>
               </div>
-              <p class="plugin-description">
-                Otomatik günlük kaydı ve moderasyon araçlarıyla sunucunuzu
-                güvende tutun.
-              </p>
-              <div class="plugin-settings">
-                <label>Moderation Log Channel</label>
-                <p class="setting-description">
-                  Tüm moderasyon işlemleri burada kaydedilecektir.
-                </p>
-                <select
-                  data-setting="logChannelId"
-                  class="setting-select"
-                ></select>
-                <hr class="separator" />
-                <label>Korunan Kanallar</label>
-                <p class="setting-description">
-                  Bu kanallar, sunucu sahibi dışında kimse tarafından silinemez.
-                </p>
-                <div class="add-item-container">
-                  <select id="channel-to-protect-select"></select>
-                  <button
-                    id="add-protected-channel-btn"
-                    type="button"
-                    class="add-btn"
-                  >
-                    Ekle
-                  </button>
+            </header>
+            <div class="plugins-grid" id="moderation-plugins-grid">
+              <div class="plugin-card" data-module="moderation">
+                <div class="plugin-header">
+                  <i class="fa-solid fa-shield-halved"></i>
+                  <h3>Moderation</h3>
+                  <i class="fa-solid fa-chevron-down collapse-icon"></i>
+                  <label class="switch" style="margin-left: auto"
+                    ><input
+                      type="checkbox"
+                      data-setting="enabled"
+                      class="enable-toggle" /><span class="slider"></span
+                  ></label>
                 </div>
-                <div id="protected-channels-list" class="protected-list"></div>
-              </div>
-              <button class="save-button">
-                Ayarları Kaydet<span class="unsaved-indicator"></span>
-              </button>
-            </div>
-
-            <div class="plugin-card" data-module="antiSpam">
-              <div class="plugin-header">
-                <i class="fa-solid fa-link-slash"></i>
-                <h3>Link Engelleyici</h3>
-                <i class="fa-solid fa-chevron-down collapse-icon"></i>
-                <label class="switch" style="margin-left: auto">
-                  <input
-                    type="checkbox"
-                    data-setting="enabled"
-                    class="enable-toggle"
-                  />
-                  <span class="slider"></span>
-                </label>
-              </div>
-              <p class="plugin-description">
-                Sunucunuzda Discord davetlerini ve diğer harici linkleri
-                engelleyin.
-              </p>
-              <div class="plugin-settings">
-                <div class="setting-with-toggle">
-                  <label>Discord Davetlerini Engelle</label>
-                  <label class="switch">
-                    <input type="checkbox" data-setting="blockInvites" />
-                    <span class="slider"></span>
-                  </label>
-                </div>
-                <div class="setting-with-toggle">
-                  <label>Diğer Linkleri Engelle</label>
-                  <label class="switch">
-                    <input type="checkbox" data-setting="blockLinks" />
-                    <span class="slider"></span>
-                  </label>
-                </div>
-                <hr class="separator" />
-                <label>İzinli Roller</label>
-                <p class="setting-description">
-                  Bu rollerdeki üyeler link paylaşabilir.
+                <p class="plugin-description">
+                  Otomatik günlük kaydı ve moderasyon araçlarıyla sunucunuzu
+                  güvende tutun.
                 </p>
-                <div
-                  id="antispam-allowed-roles-list"
-                  class="protected-list"
-                ></div>
-                <div class="add-item-container" style="margin-top: 10px">
+                <div class="plugin-settings">
+                  <label>Moderation Log Channel</label>
+                  <p class="setting-description">
+                    Tüm moderasyon işlemleri burada kaydedilecektir.
+                  </p>
                   <select
-                    id="antispam-role-select"
+                    data-setting="logChannelId"
                     class="setting-select"
                   ></select>
-                  <button
-                    id="add-antispam-role-btn"
-                    type="button"
-                    class="add-btn"
-                  >
-                    Ekle
-                  </button>
-                </div>
-                <hr class="separator" />
-                <label>Log Kanalı</label>
-                <p class="setting-description">
-                  Engellenen linkler bu kanala bildirilir.
-                </p>
-                <select
-                  data-setting="logChannelId"
-                  class="setting-select"
-                ></select>
-              </div>
-              <button class="save-button">
-                Ayarları Kaydet<span class="unsaved-indicator"></span>
-              </button>
-            </div>
-
-            <div class="plugin-card" data-module="antiRaid">
-              <div class="plugin-header">
-                <i class="fa-solid fa-user-shield"></i>
-                <h3>Anti-Spam / Raid</h3>
-                <i class="fa-solid fa-chevron-down collapse-icon"></i>
-                <label class="switch" style="margin-left: auto">
-                  <input
-                    type="checkbox"
-                    data-setting="enabled"
-                    class="enable-toggle"
-                  />
-                  <span class="slider"></span>
-                </label>
-              </div>
-              <p class="plugin-description">
-                Çok hızlı mesaj gönderen kullanıcıları otomatik olarak
-                cezalandırın.
-              </p>
-              <div class="plugin-settings">
-                <label>Eşik Değerleri</label>
-                <p class="setting-description">
-                  Bir kullanıcı
-                  <input
-                    type="number"
-                    data-setting="messageLimit"
-                    class="inline-input"
-                    min="2"
-                    max="50"
-                    value="5"
-                  />
-                  mesajı
-                  <input
-                    type="number"
-                    data-setting="timeInterval"
-                    data-type="seconds"
-                    class="inline-input"
-                    min="1"
-                    max="60"
-                    value="3"
-                  />
-                  saniye içinde gönderirse cezalandır.
-                </p>
-                <hr class="separator" />
-                <label>Eylem</label>
-                <p class="setting-description">
-                  Kullanıcıya hangi eylem uygulansın?
-                </p>
-                <select data-setting="action" class="setting-select">
-                  <option value="timeout">Sustur (10 dk)</option>
-                  <option value="kick">Sunucudan At</option>
-                  <option value="ban">Yasakla</option>
-                </select>
-              </div>
-              <button class="save-button">
-                Ayarları Kaydet<span class="unsaved-indicator"></span>
-              </button>
-            </div>
-          </div>
-        </div>
-
-        <!-- Page: Management Plugins -->
-        <div
-          class="page-content"
-          id="management-plugins-page"
-          style="display: none"
-        >
-          <header class="main-header">
-            <h2>👥 Yönetim & Takip</h2>
-            <div class="header-controls">
-              <button class="import-settings-btn header-action-btn">
-                <i class="fa-solid fa-upload"></i> Ayarları İçe Aktar
-              </button>
-              <button class="export-settings-btn header-action-btn">
-                <i class="fa-solid fa-download"></i> Ayarları Dışa Aktar
-              </button>
-              <button class="reset-all-settings-btn header-action-btn danger">
-                <i class="fa-solid fa-trash-arrow-up"></i> Tüm Ayarları Sıfırla
-              </button>
-            </div>
-          </header>
-          <div class="plugins-grid" id="management-plugins">
-            <!-- Invite Tracker Card -->
-            <div
-              class="plugin-card"
-              data-module="inviteTracker"
-              data-controls-page="invites-page"
-            >
-              <div class="plugin-header">
-                <i class="fa-solid fa-user-plus"></i>
-                <h3>Davet Takipçisi</h3>
-                <span class="new-badge">YENİ</span>
-                <i class="fa-solid fa-chevron-down collapse-icon"></i>
-                <label class="switch">
-                  <input
-                    type="checkbox"
-                    data-setting="enabled"
-                    class="enable-toggle"
-                  />
-                  <span class="slider"></span>
-                </label>
-              </div>
-              <p class="plugin-description">
-                Sunucuya kimin kimi davet ettiğini takip eder ve loglar.
-              </p>
-              <div class="plugin-settings">
-                <label for="invite-tracker-log-channel">Log Kanalı</label>
-                <select
-                  id="invite-tracker-log-channel"
-                  data-setting="logChannelId"
-                ></select>
-                <hr class="separator" />
-                <label>Davet Ödülleri</label>
-                <p class="setting-description">
-                  Belirtilen davet sayısına ulaşan kullanıcılara otomatik rol
-                  verin.
-                </p>
-                <div id="invite-rewards-list" class="protected-list"></div>
-                <div class="add-item-container" style="margin-top: 10px">
-                  <input
-                    type="number"
-                    id="new-reward-count"
-                    class="setting-input"
-                    placeholder="Davet Sayısı"
-                    min="1"
-                    style="flex-grow: 0; width: 120px"
-                  />
-                  <select
-                    id="new-reward-role-select"
-                    style="flex-grow: 1"
-                  ></select>
-                  <button
-                    id="add-invite-reward-btn"
-                    type="button"
-                    class="add-btn"
-                  >
-                    Ekle
-                  </button>
-                </div>
-              </div>
-              <button type="button" class="save-button">
-                Ayarları Kaydet<span class="unsaved-indicator"></span>
-              </button>
-            </div>
-            <div class="plugin-card" data-module="tickets">
-              <div class="plugin-header">
-                <i class="fa-solid fa-ticket-simple"></i>
-                <h3>Bilet Sistemi</h3>
-                <i class="fa-solid fa-chevron-down collapse-icon"></i>
-                <label class="switch" style="margin-left: auto">
-                  <input
-                    type="checkbox"
-                    data-setting="enabled"
-                    class="enable-toggle"
-                  />
-                  <span class="slider"></span>
-                </label>
-              </div>
-              <p class="plugin-description">
-                Kullanıcıların destek talepleri oluşturması için bir panel ve
-                özel kanallar oluşturur.
-              </p>
-              <div class="plugin-settings">
-                <label>Bilet Kategorisi</label>
-                <p class="setting-description">
-                  Oluşturulan bilet kanalları bu kategorinin altına açılacaktır.
-                </p>
-                <select
-                  data-setting="categoryId"
-                  class="setting-select"
-                ></select>
-                <hr class="separator" />
-                <label>Destek Rolü</label>
-                <p class="setting-description">
-                  Bu role sahip üyeler biletleri görebilir ve yanıtlayabilir.
-                </p>
-                <select
-                  data-setting="supportRoleId"
-                  class="setting-select"
-                ></select>
-                <hr class="separator" />
-                <label>Log Kanalı</label>
-                <p class="setting-description">
-                  Oluşturulan ve kapatılan biletler bu kanala bildirilir.
-                </p>
-                <select
-                  data-setting="logChannelId"
-                  class="setting-select"
-                ></select>
-                <hr class="separator" />
-                <label>Bilet Karşılama Mesajı</label>
-                <textarea
-                  data-setting="welcomeMessage"
-                  placeholder="Destek ekibimiz en kısa sürede size yardımcı olacaktır..."
-                ></textarea>
-                <hr class="separator" />
-                <label>Bilet Kapatma Mesajı</label>
-                <p class="setting-description">
-                  Bilet kapatıldığında kullanıcıya gönderilecek özel mesaj.
-                  Değişkenler: {user}, {ticket_id}
-                </p>
-                <textarea
-                  data-setting="closeMessage"
-                  placeholder="Biletiniz çözüme ulaştırılmıştır. Bizi değerlendirmeyi unutmayın!"
-                ></textarea>
-                <hr class="separator" />
-                <div class="setting-with-header">
-                  <label>Bilet Konuları</label>
-                  <button
-                    type="button"
-                    id="add-ticket-topic-btn"
-                    class="add-btn-small"
-                  >
-                    <i class="fa-solid fa-plus"></i> Konu Ekle
-                  </button>
-                </div>
-                <p class="setting-description">
-                  Kullanıcıların bilet oluştururken seçebileceği konuları
-                  yönetin.
-                </p>
-                <div id="ticket-topics-list" class="item-list-container">
-                  <!-- Topics will be rendered here by JS -->
-                </div>
-              </div>
-              <button class="save-button">
-                Ayarları Kaydet<span class="unsaved-indicator"></span>
-              </button>
-            </div>
-            <div class="plugin-card" data-module="autorole">
-              <div class="plugin-header">
-                <i class="fa-solid fa-user-tag"></i>
-                <h3>Otomatik Rol</h3>
-                <i class="fa-solid fa-chevron-down collapse-icon"></i>
-                <label class="switch" style="margin-left: auto">
-                  <input
-                    type="checkbox"
-                    data-setting="enabled"
-                    class="enable-toggle"
-                  />
-                  <span class="slider"></span>
-                </label>
-              </div>
-              <p class="plugin-description">
-                Sunucuya yeni katılan üyelere otomatik olarak bir rol verin.
-              </p>
-              <div class="plugin-settings">
-                <label>Verilecek Rol</label>
-                <p class="setting-description">
-                  Bu rol, sunucuya katılan her yeni üyeye verilecektir.
-                </p>
-                <select data-setting="roleId" class="setting-select"></select>
-              </div>
-              <button class="save-button">
-                Ayarları Kaydet<span class="unsaved-indicator"></span>
-              </button>
-            </div>
-
-            <div class="plugin-card" data-module="reactionRoles">
-              <div class="plugin-header">
-                <i class="fa-solid fa-masks-theater"></i>
-                <h3>Tepki Rolleri</h3>
-                <i class="fa-solid fa-chevron-down collapse-icon"></i>
-                <label class="switch" style="margin-left: auto"
-                  ><input
-                    type="checkbox"
-                    data-setting="enabled"
-                    class="enable-toggle" /><span class="slider"></span
-                ></label>
-              </div>
-              <p class="plugin-description">
-                Kullanıcıların bir mesaja tepki vererek roller almasına izin
-                verin.
-              </p>
-              <div class="plugin-settings">
-                <label>Mesajın Bulunduğu Kanal</label>
-                <select
-                  data-setting="channelId"
-                  class="setting-select"
-                ></select>
-                <label>Mesaj Kimliği</label>
-                <input
-                  type="text"
-                  data-setting="messageId"
-                  placeholder="Mesajı sağ tıklayın -> Mesaj Kimliğini Kopyala"
-                />
-                <label>Emoji</label>
-                <input
-                  type="text"
-                  data-setting="emoji"
-                  placeholder="Örneğin, ✅ veya özel bir emoji adını belirtin"
-                />
-                <label>Verilecek Rol</label>
-                <select data-setting="roleId" class="setting-select"></select>
-              </div>
-              <button class="save-button">
-                Kaydet ve Tepki Ekle<span class="unsaved-indicator"></span>
-              </button>
-            </div>
-
-            <div
-              class="plugin-card"
-              data-module="leveling"
-              data-controls-page="leaderboard-page"
-            >
-              <div class="plugin-header">
-                <i class="fa-solid fa-star"></i>
-                <h3>Seviye Sistemi</h3>
-                <i class="fa-solid fa-chevron-down collapse-icon"></i>
-                <label class="switch" style="margin-left: auto">
-                  <input
-                    type="checkbox"
-                    data-setting="enabled"
-                    class="enable-toggle"
-                  />
-                  <span class="slider"></span>
-                </label>
-              </div>
-              <p class="plugin-description">
-                Sunucunuzda aktif olan üyeleri XP ve seviyelerle ödüllendirin.
-              </p>
-              <div class="plugin-settings">
-                <label>XP Kazanma Aralığı</label>
-                <p class="setting-description">
-                  Her mesajda kazanılacak min ve max XP miktarını belirleyin.
-                </p>
-                <div class="inline-setting-group">
-                  <input
-                    type="number"
-                    data-setting="xpMin"
-                    class="setting-input"
-                    placeholder="Min XP"
-                    value="15"
-                  />
-                  <input
-                    type="number"
-                    data-setting="xpMax"
-                    class="setting-input"
-                    placeholder="Max XP"
-                    value="25"
-                  />
-                </div>
-                <label>Seviye Atladığında Gönderilecek Mesaj</label>
-                <textarea
-                  data-setting="levelUpMessage"
-                  placeholder="Tebrikler {user}, {level}. seviyeye ulaştın!"
-                ></textarea>
-                <label>Seviye Atlama Mesaj Kanalı</label>
-                <select
-                  data-setting="levelUpChannelId"
-                  class="setting-select"
-                ></select>
-              </div>
-              <button class="save-button">
-                Ayarları Kaydet<span class="unsaved-indicator"></span>
-              </button>
-            </div>
-            <% if (isBotOwner) { %>
-              <!-- Bot Durumu Ayarları Kartı (Sadece Bot Sahibi Görür) -->
-              <div class="plugin-card" data-module="botStatus">
-                <div class="plugin-header">
-                  <div class="plugin-info">
-                    <i class="fa-solid fa-robot plugin-icon"></i>
-                    <div class="plugin-title-desc">
-                      <h3>Bot Durumu</h3>
-                      <p>Botun Discord'daki durumunu ve aktivitesini yönetin.</p>
-                    </div>
+                  <hr class="separator" />
+                  <label>Korunan Kanallar</label>
+                  <p class="setting-description">
+                    Bu kanallar, sunucu sahibi dışında kimse tarafından silinemez.
+                  </p>
+                  <div class="add-item-container">
+                    <select id="channel-to-protect-select"></select>
+                    <button
+                      id="add-protected-channel-btn"
+                      type="button"
+                      class="add-btn"
+                    >
+                      Ekle
+                    </button>
                   </div>
-                  <div class="plugin-actions">
+                  <div id="protected-channels-list" class="protected-list"></div>
+                </div>
+                <button class="save-button">
+                  Ayarları Kaydet<span class="unsaved-indicator"></span>
+                </button>
+              </div>
+  
+              <div class="plugin-card" data-module="antiSpam">
+                <div class="plugin-header">
+                  <i class="fa-solid fa-link-slash"></i>
+                  <h3>Link Engelleyici</h3>
+                  <i class="fa-solid fa-chevron-down collapse-icon"></i>
+                  <label class="switch" style="margin-left: auto">
+                    <input
+                      type="checkbox"
+                      data-setting="enabled"
+                      class="enable-toggle"
+                    />
+                    <span class="slider"></span>
+                  </label>
+                </div>
+                <p class="plugin-description">
+                  Sunucunuzda Discord davetlerini ve diğer harici linkleri
+                  engelleyin.
+                </p>
+                <div class="plugin-settings">
+                  <div class="setting-with-toggle">
+                    <label>Discord Davetlerini Engelle</label>
                     <label class="switch">
-                      <input type="checkbox" class="enable-toggle" data-setting="enabled">
-                      <span class="slider round"></span>
+                      <input type="checkbox" data-setting="blockInvites" />
+                      <span class="slider"></span>
                     </label>
                   </div>
+                  <div class="setting-with-toggle">
+                    <label>Diğer Linkleri Engelle</label>
+                    <label class="switch">
+                      <input type="checkbox" data-setting="blockLinks" />
+                      <span class="slider"></span>
+                    </label>
+                  </div>
+                  <hr class="separator" />
+                  <label>İzinli Roller</label>
+                  <p class="setting-description">
+                    Bu rollerdeki üyeler link paylaşabilir.
+                  </p>
+                  <div
+                    id="antispam-allowed-roles-list"
+                    class="protected-list"
+                  ></div>
+                  <div class="add-item-container" style="margin-top: 10px">
+                    <select
+                      id="antispam-role-select"
+                      class="setting-select"
+                    ></select>
+                    <button
+                      id="add-antispam-role-btn"
+                      type="button"
+                      class="add-btn"
+                    >
+                      Ekle
+                    </button>
+                  </div>
+                  <hr class="separator" />
+                  <label>Log Kanalı</label>
+                  <p class="setting-description">
+                    Engellenen linkler bu kanala bildirilir.
+                  </p>
+                  <select
+                    data-setting="logChannelId"
+                    class="setting-select"
+                  ></select>
                 </div>
-                <div class="plugin-content">
-                  <div class="setting-item">
-                    <label for="bot-status-type">Durum</label>
-                    <select id="bot-status-type" data-setting="statusType">
-                      <option value="online">Çevrimiçi</option>
-                      <option value="idle">Boşta</option>
-                      <option value="dnd">Rahatsız Etmeyin</option>
-                    </select>
-                  </div>
-                  <div class="setting-item">
-                    <label for="bot-activity-type">Aktivite Türü</label>
-                    <select id="bot-activity-type" data-setting="activityType">
-                      <option value="Playing">Oynuyor</option>
-                      <option value="Watching">İzliyor</option>
-                      <option value="Listening">Dinliyor</option>
-                      <option value="Competing">Yarışıyor</option>
-                    </select>
-                  </div>
-                  <div class="setting-item">
-                    <label for="bot-activity-text">Aktivite Metni</label>
-                    <input type="text" id="bot-activity-text" data-setting="activityText" placeholder="Örn: Destek Bekliyor...">
-                  </div>
-                  <button type="button" class="save-button">Ayarları Kaydet</button>
-                </div>
+                <button class="save-button">
+                  Ayarları Kaydet<span class="unsaved-indicator"></span>
+                </button>
               </div>
-            <% } %>
+  
+              <div class="plugin-card" data-module="antiRaid">
+                <div class="plugin-header">
+                  <i class="fa-solid fa-user-shield"></i>
+                  <h3>Anti-Spam / Raid</h3>
+                  <i class="fa-solid fa-chevron-down collapse-icon"></i>
+                  <label class="switch" style="margin-left: auto">
+                    <input
+                      type="checkbox"
+                      data-setting="enabled"
+                      class="enable-toggle"
+                    />
+                    <span class="slider"></span>
+                  </label>
+                </div>
+                <p class="plugin-description">
+                  Çok hızlı mesaj gönderen kullanıcıları otomatik olarak
+                  cezalandırın.
+                </p>
+                <div class="plugin-settings">
+                  <label>Eşik Değerleri</label>
+                  <p class="setting-description">
+                    Bir kullanıcı
+                    <input
+                      type="number"
+                      data-setting="messageLimit"
+                      class="inline-input"
+                      min="2"
+                      max="50"
+                      value="5"
+                    />
+                    mesajı
+                    <input
+                      type="number"
+                      data-setting="timeInterval"
+                      data-type="seconds"
+                      class="inline-input"
+                      min="1"
+                      max="60"
+                      value="3"
+                    />
+                    saniye içinde gönderirse cezalandır.
+                  </p>
+                  <hr class="separator" />
+                  <label>Eylem</label>
+                  <p class="setting-description">
+                    Kullanıcıya hangi eylem uygulansın?
+                  </p>
+                  <select data-setting="action" class="setting-select">
+                    <option value="timeout">Sustur (10 dk)</option>
+                    <option value="kick">Sunucudan At</option>
+                    <option value="ban">Yasakla</option>
+                  </select>
+                </div>
+                <button class="save-button">
+                  Ayarları Kaydet<span class="unsaved-indicator"></span>
+                </button>
+              </div>
+            </div>
+          </div>
+          <!-- =================================================================
+               YÖNETİM EKLENTİLERİ
+               ================================================================= -->
+          <div class="plugins-grid-container">
+            <header class="main-header">
+              <h2>👥 Yönetim & Takip</h2>
+              <div class="header-controls">
+                <button class="import-settings-btn header-action-btn">
+                  <i class="fa-solid fa-upload"></i> Ayarları İçe Aktar
+                </button>
+                <button class="export-settings-btn header-action-btn">
+                  <i class="fa-solid fa-download"></i> Ayarları Dışa Aktar
+                </button>
+                <button class="reset-all-settings-btn header-action-btn danger">
+                  <i class="fa-solid fa-trash-arrow-up"></i> Tüm Ayarları Sıfırla
+                </button>
+              </div>
+            </header>
+            <div class="plugins-grid">
+              <!-- Invite Tracker Card -->
+              <div
+                class="plugin-card"
+                data-module="inviteTracker"
+                data-controls-page="invites-page"
+              >
+                <div class="plugin-header">
+                  <i class="fa-solid fa-user-plus"></i>
+                  <h3>Davet Takipçisi</h3>
+                  <span class="new-badge">YENİ</span>
+                  <i class="fa-solid fa-chevron-down collapse-icon"></i>
+                  <label class="switch">
+                    <input
+                      type="checkbox"
+                      data-setting="enabled"
+                      class="enable-toggle"
+                    />
+                    <span class="slider"></span>
+                  </label>
+                </div>
+                <p class="plugin-description">
+                  Sunucuya kimin kimi davet ettiğini takip eder ve loglar.
+                </p>
+                <div class="plugin-settings">
+                  <label for="invite-tracker-log-channel">Log Kanalı</label>
+                  <select
+                    id="invite-tracker-log-channel"
+                    data-setting="logChannelId"
+                  ></select>
+                  <hr class="separator" />
+                  <label>Davet Ödülleri</label>
+                  <p class="setting-description">
+                    Belirtilen davet sayısına ulaşan kullanıcılara otomatik rol
+                    verin.
+                  </p>
+                  <div id="invite-rewards-list" class="protected-list"></div>
+                  <div class="add-item-container" style="margin-top: 10px">
+                    <input
+                      type="number"
+                      id="new-reward-count"
+                      class="setting-input"
+                      placeholder="Davet Sayısı"
+                      min="1"
+                      style="flex-grow: 0; width: 120px"
+                    />
+                    <select
+                      id="new-reward-role-select"
+                      style="flex-grow: 1"
+                    ></select>
+                    <button
+                      id="add-invite-reward-btn"
+                      type="button"
+                      class="add-btn"
+                    >
+                      Ekle
+                    </button>
+                  </div>
+                </div>
+                <button type="button" class="save-button">
+                  Ayarları Kaydet<span class="unsaved-indicator"></span>
+                </button>
+              </div>
+  
+              <!-- YENİ: Karşılama & Uğurlama Kartı -->
+              <div class="plugin-card" data-module="welcome">
+                <div class="plugin-header">
+                  <i class="fa-solid fa-hand-sparkles"></i>
+                  <h3>Karşılama & Uğurlama</h3>
+                  <i class="fa-solid fa-chevron-down collapse-icon"></i>
+                  <label class="switch" style="margin-left: auto">
+                    <input type="checkbox" data-setting="enabled" class="enable-toggle" />
+                    <span class="slider"></span>
+                  </label>
+                </div>
+                <p class="plugin-description">
+                  Sunucuya yeni katılan veya ayrılan üyelere otomatik mesajlar gönderin.
+                </p>
+                <div class="plugin-settings">
+                  <!-- Karşılama Ayarları -->
+                  <div class="setting-with-toggle">
+                    <label>Karşılama Mesajı</label>
+                    <label class="switch">
+                      <input type="checkbox" data-setting="welcomeEnabled" />
+                      <span class="slider"></span>
+                    </label>
+                  </div>
+                  <p class="setting-description">
+                    Değişkenler: {user}, {user.tag}, {user.name}, {server.name}, {member.count}
+                  </p>
+                  <textarea data-setting="welcomeMessage" placeholder="Aramıza hoş geldin, {user}! 🎉"></textarea>
+                  <label>Karşılama Kanalı</label>
+                  <select data-setting="welcomeChannelId" class="setting-select"></select>
+                  <label>Karşılama Arkaplan Resmi</label>
+                  <div class="image-upload-container">
+                    <img id="welcome-bg-preview" class="image-preview" src="" alt="Arkaplan Önizleme" style="display:none;">
+                    <input type="file" class="image-upload-input" data-type="welcome" accept="image/png, image/jpeg, image/gif">
+                    <p class="setting-description">Yeni bir resim yüklemek için seçin. (Max 5MB)</p>
+                  </div>
+  
+                  <hr class="separator" />
+  
+                  <!-- Uğurlama Ayarları -->
+                  <div class="setting-with-toggle">
+                    <label>Uğurlama Mesajı</label>
+                    <label class="switch">
+                      <input type="checkbox" data-setting="goodbyeEnabled" />
+                      <span class="slider"></span>
+                    </label>
+                  </div>
+                  <p class="setting-description">
+                    Değişkenler: {user}, {user.tag}, {user.name}, {server.name}, {member.count}
+                  </p>
+                  <textarea data-setting="goodbyeMessage" placeholder="Görüşürüz, {user}! 👋"></textarea>
+                  <label>Uğurlama Kanalı</label>
+                  <select data-setting="goodbyeChannelId" class="setting-select"></select>
+                  <label>Uğurlama Arkaplan Resmi</label>
+                  <div class="image-upload-container">
+                    <img id="goodbye-bg-preview" class="image-preview" src="" alt="Arkaplan Önizleme" style="display:none;">
+                    <input type="file" class="image-upload-input" data-type="goodbye" accept="image/png, image/jpeg, image/gif">
+                    <p class="setting-description">Yeni bir resim yüklemek için seçin. (Max 5MB)</p>
+                  </div>
+                </div>
+                <button class="save-button">
+                  Ayarları Kaydet<span class="unsaved-indicator"></span>
+                </button>
+              </div>
+              <!-- YENİ KART SONU -->
+  
+              <div class="plugin-card" data-module="tickets">
+                <div class="plugin-header">
+                  <i class="fa-solid fa-ticket-simple"></i>
+                  <h3>Bilet Sistemi</h3>
+                  <i class="fa-solid fa-chevron-down collapse-icon"></i>
+                  <label class="switch" style="margin-left: auto">
+                    <input
+                      type="checkbox"
+                      data-setting="enabled"
+                      class="enable-toggle"
+                    />
+                    <span class="slider"></span>
+                  </label>
+                </div>
+                <p class="plugin-description">
+                  Kullanıcıların destek talepleri oluşturması için bir panel ve
+                  özel kanallar oluşturur.
+                </p>
+                <div class="plugin-settings">
+                  <label>Bilet Kategorisi</label>
+                  <p class="setting-description">
+                    Oluşturulan bilet kanalları bu kategorinin altına açılacaktır.
+                  </p>
+                  <select
+                    data-setting="categoryId"
+                    class="setting-select"
+                  ></select>
+                  <hr class="separator" />
+                  <label>Destek Rolü</label>
+                  <p class="setting-description">
+                    Bu role sahip üyeler biletleri görebilir ve yanıtlayabilir.
+                  </p>
+                  <select
+                    data-setting="supportRoleId"
+                    class="setting-select"
+                  ></select>
+                  <hr class="separator" />
+                  <label>Log Kanalı</label>
+                  <p class="setting-description">
+                    Oluşturulan ve kapatılan biletler bu kanala bildirilir.
+                  </p>
+                  <select
+                    data-setting="logChannelId"
+                    class="setting-select"
+                  ></select>
+                  <hr class="separator" />
+                  <label>Bilet Karşılama Mesajı</label>
+                  <textarea
+                    data-setting="welcomeMessage"
+                    placeholder="Destek ekibimiz en kısa sürede size yardımcı olacaktır..."
+                  ></textarea>
+                  <hr class="separator" />
+                  <label>Bilet Kapatma Mesajı</label>
+                  <p class="setting-description">
+                    Bilet kapatıldığında kullanıcıya gönderilecek özel mesaj.
+                    Değişkenler: {user}, {ticket_id}
+                  </p>
+                  <textarea
+                    data-setting="closeMessage"
+                    placeholder="Biletiniz çözüme ulaştırılmıştır. Bizi değerlendirmeyi unutmayın!"
+                  ></textarea>
+                  <hr class="separator" />
+                  <div class="setting-with-header">
+                    <label>Bilet Konuları</label>
+                    <button
+                      type="button"
+                      id="add-ticket-topic-btn"
+                      class="add-btn-small"
+                    >
+                      <i class="fa-solid fa-plus"></i> Konu Ekle
+                    </button>
+                  </div>
+                  <p class="setting-description">
+                    Kullanıcıların bilet oluştururken seçebileceği konuları
+                    yönetin.
+                  </p>
+                  <div id="ticket-topics-list" class="item-list-container">
+                    <!-- Topics will be rendered here by JS -->
+                  </div>
+                </div>
+                <button class="save-button">
+                  Ayarları Kaydet<span class="unsaved-indicator"></span>
+                </button>
+              </div>
+              <div class="plugin-card" data-module="autorole">
+                <div class="plugin-header">
+                  <i class="fa-solid fa-user-tag"></i>
+                  <h3>Otomatik Rol</h3>
+                  <i class="fa-solid fa-chevron-down collapse-icon"></i>
+                  <label class="switch" style="margin-left: auto">
+                    <input
+                      type="checkbox"
+                      data-setting="enabled"
+                      class="enable-toggle"
+                    />
+                    <span class="slider"></span>
+                  </label>
+                </div>
+                <p class="plugin-description">
+                  Sunucuya yeni katılan üyelere otomatik olarak bir rol verin.
+                </p>
+                <div class="plugin-settings">
+                  <label>Verilecek Rol</label>
+                  <p class="setting-description">
+                    Bu rol, sunucuya katılan her yeni üyeye verilecektir.
+                  </p>
+                  <select data-setting="roleId" class="setting-select"></select>
+                </div>
+                <button class="save-button">
+                  Ayarları Kaydet<span class="unsaved-indicator"></span>
+                </button>
+              </div>
+  
+              <div class="plugin-card" data-module="reactionRoles">
+                <div class="plugin-header">
+                  <i class="fa-solid fa-masks-theater"></i>
+                  <h3>Tepki Rolleri</h3>
+                  <i class="fa-solid fa-chevron-down collapse-icon"></i>
+                  <label class="switch" style="margin-left: auto"
+                    ><input
+                      type="checkbox"
+                      data-setting="enabled"
+                      class="enable-toggle" /><span class="slider"></span
+                  ></label>
+                </div>
+                <p class="plugin-description">
+                  Kullanıcıların bir mesaja tepki vererek roller almasına izin
+                  verin.
+                </p>
+                <div class="plugin-settings">
+                  <label>Mesajın Bulunduğu Kanal</label>
+                  <select
+                    data-setting="channelId"
+                    class="setting-select"
+                  ></select>
+                  <label>Mesaj Kimliği</label>
+                  <input
+                    type="text"
+                    data-setting="messageId"
+                    placeholder="Mesajı sağ tıklayın -> Mesaj Kimliğini Kopyala"
+                  />
+                  <label>Emoji</label>
+                  <input
+                    type="text"
+                    data-setting="emoji"
+                    placeholder="Örneğin, ✅ veya özel bir emoji adını belirtin"
+                  />
+                  <label>Verilecek Rol</label>
+                  <select data-setting="roleId" class="setting-select"></select>
+                </div>
+                <button class="save-button">
+                  Kaydet ve Tepki Ekle<span class="unsaved-indicator"></span>
+                </button>
+              </div>
+  
+              <div
+                class="plugin-card"
+                data-module="leveling"
+                data-controls-page="leaderboard-page"
+              >
+                <div class="plugin-header">
+                  <i class="fa-solid fa-star"></i>
+                  <h3>Seviye Sistemi</h3>
+                  <i class="fa-solid fa-chevron-down collapse-icon"></i>
+                  <label class="switch" style="margin-left: auto">
+                    <input
+                      type="checkbox"
+                      data-setting="enabled"
+                      class="enable-toggle"
+                    />
+                    <span class="slider"></span>
+                  </label>
+                </div>
+                <p class="plugin-description">
+                  Sunucunuzda aktif olan üyeleri XP ve seviyelerle ödüllendirin.
+                </p>
+                <div class="plugin-settings">
+                  <label>XP Kazanma Aralığı</label>
+                  <p class="setting-description">
+                    Her mesajda kazanılacak min ve max XP miktarını belirleyin.
+                  </p>
+                  <div class="inline-setting-group">
+                    <input
+                      type="number"
+                      data-setting="xpMin"
+                      class="setting-input"
+                      placeholder="Min XP"
+                      value="15"
+                    />
+                    <input
+                      type="number"
+                      data-setting="xpMax"
+                      class="setting-input"
+                      placeholder="Max XP"
+                      value="25"
+                    />
+                  </div>
+                  <label>Seviye Atladığında Gönderilecek Mesaj</label>
+                  <textarea
+                    data-setting="levelUpMessage"
+                    placeholder="Tebrikler {user}, {level}. seviyeye ulaştın!"
+                  ></textarea>
+                  <label>Seviye Atlama Mesaj Kanalı</label>
+                  <select
+                    data-setting="levelUpChannelId"
+                    class="setting-select"
+                  ></select>
+                </div>
+                <button class="save-button">
+                  Ayarları Kaydet<span class="unsaved-indicator"></span>
+                </button>
+              </div>
+              <% if (isBotOwner) { %>
+                <!-- Bot Durumu Ayarları Kartı (Sadece Bot Sahibi Görür) -->
+                <div class="plugin-card" data-module="botStatus">
+                  <div class="plugin-header">
+                    <div class="plugin-info">
+                      <i class="fa-solid fa-robot plugin-icon"></i>
+                      <div class="plugin-title-desc">
+                        <h3>Bot Durumu</h3>
+                        <p>Botun Discord'daki durumunu ve aktivitesini yönetin.</p>
+                      </div>
+                    </div>
+                    <div class="plugin-actions">
+                      <label class="switch">
+                        <input type="checkbox" class="enable-toggle" data-setting="enabled">
+                        <span class="slider round"></span>
+                      </label>
+                    </div>
+                  </div>
+                  <div class="plugin-content">
+                    <div class="setting-item">
+                      <label for="bot-status-type">Durum</label>
+                      <select id="bot-status-type" data-setting="statusType">
+                        <option value="online">Çevrimiçi</option>
+                        <option value="idle">Boşta</option>
+                        <option value="dnd">Rahatsız Etmeyin</option>
+                      </select>
+                    </div>
+                    <div class="setting-item">
+                      <label for="bot-activity-type">Aktivite Türü</label>
+                      <select id="bot-activity-type" data-setting="activityType">
+                        <option value="Playing">Oynuyor</option>
+                        <option value="Watching">İzliyor</option>
+                        <option value="Listening">Dinliyor</option>
+                        <option value="Competing">Yarışıyor</option>
+                      </select>
+                    </div>
+                    <div class="setting-item">
+                      <label for="bot-activity-text">Aktivite Metni</label>
+                      <input type="text" id="bot-activity-text" data-setting="activityText" placeholder="Örn: Destek Bekliyor...">
+                    </div>
+                    <button type="button" class="save-button">Ayarları Kaydet</button>
+                  </div>
+                </div>
+              <% } %>
+            </div>
           </div>
         </div>
 
@@ -806,6 +870,79 @@
             <div id="mod-log-list">
               <!-- Moderation log entries will be inserted here -->
             </div>
+          </div>
+        </div>
+
+        <!-- Page: Custom Commands -->
+        <div class="page-content" id="custom-commands-page" style="display: none">
+          <header class="main-header">
+            <h2><i class="fa-solid fa-terminal"></i> Özel Komutlar</h2>
+          </header>
+          <div class="maintenance-notice">
+            <i class="fa-solid fa-screwdriver-wrench"></i>
+            <h3>Bu Özellik Bakımda</h3>
+            <p>
+              Özel komutlar özelliği şu anda geliştirme aşamasındadır ve geçici olarak devre dışı bırakılmıştır.
+              Anlayışınız için teşekkür ederiz.
+            </p>
+          </div>
+        </div>
+
+        <!-- Custom Command Add/Edit Modal -->
+        <div id="custom-command-modal" class="modal-overlay" style="display: none">
+          <div class="modal-content role-edit-modal-content">
+            <h3 id="custom-command-modal-title">Yeni Komut Ekle</h3>
+            <form id="custom-command-form">
+              <input type="hidden" id="custom-command-id" />
+              <div class="form-group">
+                <label for="custom-command-trigger">Tetikleyici (Örn: !selam)</label>
+                <input
+                  type="text"
+                  id="custom-command-trigger"
+                  placeholder="Örn: !selam"
+                  required
+                />
+              </div>
+              <div class="form-group">
+                <label for="custom-command-response">Yanıt</label>
+                <textarea
+                  id="custom-command-response"
+                  placeholder="Botun vereceği yanıt..."
+                  required
+                ></textarea>
+              </div>
+              <div class="form-group">
+                <label for="custom-command-type">Yanıt Türü</label>
+                <select id="custom-command-type" required>
+                  <option value="text">Metin</option>
+                  <!-- Gelecekte eklenebilecek türler: embed, image, dm -->
+                </select>
+              </div>
+              <div class="form-group">
+                <label for="custom-command-roles">İzinli Roller (Boş bırakılırsa herkes kullanabilir)</label>
+                <select id="custom-command-roles" class="setting-select" multiple>
+                  <!-- Roller JS ile doldurulacak -->
+                </select>
+                <p class="setting-description">Sadece seçili rollerdeki üyeler bu komutu kullanabilir.</p>
+              </div>
+              <div class="form-group">
+                <label for="custom-command-channels">İzinli Kanallar (Boş bırakılırsa her kanalda çalışır)</label>
+                <select id="custom-command-channels" class="setting-select" multiple>
+                  <!-- Kanallar JS ile doldurulacak -->
+                </select>
+                <p class="setting-description">Komut sadece seçili kanallarda kullanılabilir.</p>
+              </div>
+              <div class="form-group">
+                <div class="setting-with-toggle" style="padding: 0;">
+                  <label for="custom-command-enabled">Komut Aktif</label>
+                  <label class="switch"><input type="checkbox" id="custom-command-enabled" checked /><span class="slider"></span></label>
+                </div>
+              </div>
+              <div class="modal-actions">
+                <button type="button" id="custom-command-modal-cancel" class="sidebar-btn">İptal</button>
+                <button type="submit" id="custom-command-modal-save" class="sidebar-btn save">Kaydet</button>
+              </div>
+            </form>
           </div>
         </div>
 

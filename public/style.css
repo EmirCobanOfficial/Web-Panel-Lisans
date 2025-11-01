@@ -15,6 +15,7 @@
   --accent-cyan: #06b6d4;
   --green: #10b981;
   --red: #ef4444;
+  --blue: #3b82f6; /* YENİ: Mavi rengi tanımla */
   --orange: #f59e0b;
   --border-color: rgba(255, 255, 255, 0.08);
   --border-hover: rgba(255, 255, 255, 0.12);
@@ -369,6 +370,16 @@ body {
   box-shadow: var(--shadow-xl), var(--glow-brand);
   border-color: rgba(88, 101, 242, 0.3);
 }
+
+/* YENİ: Eklenti kategorilerini ve gridlerini bir arada tutan kapsayıcı */
+.plugins-grid-container {
+    display: none; /* Varsayılan olarak gizli */
+}
+
+.plugins-grid-container .plugin-category-header {
+    margin-top: 0; /* İlk başlığın üst boşluğunu kaldır */
+}
+
 
 .plugin-card.sortable-chosen {
   cursor: grabbing;
@@ -2600,6 +2611,65 @@ input:checked + .slider:before {
 }
 
 /* =================================================================
+   TABLO / LİSTE İŞLEM BUTONLARI (YENİ)
+   ================================================================= */
+
+.action-btn {
+  background-color: var(--background-light);
+  color: var(--text-color);
+  border: 1px solid var(--border-color);
+  border-radius: 5px;
+  padding: 5px 10px;
+  cursor: pointer;
+  font-size: 14px;
+  transition: background-color 0.2s, color 0.2s, border-color 0.2s;
+  margin: 0 2px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 5px;
+}
+
+.action-btn:hover {
+  background-color: var(--background-lighter);
+  border-color: var(--primary-color);
+}
+
+/* Düzenleme / Yapıcı Eylem Butonu */
+.action-btn.edit {
+  background-color: var(--blue);
+  color: #fff;
+  border-color: var(--blue);
+}
+.action-btn.edit:hover {
+  background-color: #3a8ee8; /* Biraz daha açık mavi */
+}
+
+/* Silme / Tehlikeli Eylem Butonu */
+.action-btn.danger {
+  background-color: var(--red);
+  color: #fff;
+  border-color: var(--red);
+}
+.action-btn.danger:hover {
+  background-color: #e53935; /* Biraz daha koyu kırmızı */
+}
+
+/* =================================================================
+   ÖZEL KOMUTLAR TABLOSU STİLLERİ
+   ================================================================= */
+.custom-commands-table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.custom-commands-table th, .custom-commands-table td {
+  padding: 16px 20px;
+  text-align: left;
+  border-bottom: 1px solid var(--border-color);
+}
+
+/* =================================================================
    BOT DURUMU KARTI ÖZEL STİLLERİ
    ================================================================= */
 
@@ -2657,4 +2727,83 @@ input:checked + .slider:before {
 .setting-select option {
   background: var(--bg-secondary);
   color: var(--text-primary);
+}
+
+/* Resim Yükleme Stilleri (YENİ) */
+.image-upload-container {
+    margin-top: 10px;
+    background: rgba(255, 255, 255, 0.03);
+    border: 1px solid var(--border-color);
+    border-radius: 12px;
+    padding: 15px;
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+}
+
+.image-preview {
+    max-width: 100%;
+    height: auto;
+    border-radius: 8px;
+    border: 1px solid var(--border-hover);
+    object-fit: cover;
+    max-height: 150px;
+}
+
+.image-upload-input {
+  width: 100%;
+  color: var(--text-secondary);
+  font-size: 13px;
+}
+
+/* Dosya seçme butonunun görünümünü iyileştir */
+.image-upload-input::file-selector-button {
+  background: rgba(255, 255, 255, 0.08);
+  border: 1px solid var(--border-color);
+  color: var(--text-primary);
+  padding: 8px 12px;
+  border-radius: 8px;
+  cursor: pointer;
+  margin-right: 15px;
+  transition: background 0.2s, border-color 0.2s;
+  font-weight: 500;
+}
+
+.image-upload-input::file-selector-button:hover {
+  background: rgba(88, 101, 242, 0.1);
+  border-color: var(--brand-color);
+}
+
+.image-upload-input:hover {
+    background: rgba(88, 101, 242, 0.1);
+    border-color: var(--brand-color);
+}
+
+/* =================================================================
+   BAKIM BİLDİRİMİ STİLİ (YENİ)
+   ================================================================= */
+.maintenance-notice {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  padding: 80px 40px;
+  background: var(--glass-bg);
+  border: 1px solid var(--border-color);
+  border-radius: 20px;
+  margin-top: 20px;
+  color: var(--text-secondary);
+}
+
+.maintenance-notice i {
+  font-size: 4em;
+  color: var(--brand-color);
+  margin-bottom: 25px;
+}
+
+.maintenance-notice h3 {
+  font-size: 1.8em;
+  color: var(--text-primary);
+  margin-bottom: 15px;
 }

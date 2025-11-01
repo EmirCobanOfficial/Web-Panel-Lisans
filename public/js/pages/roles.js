@@ -177,7 +177,7 @@ export async function initRolesPage() {
     container.innerHTML = '<p>Roller yükleniyor...</p>';
 
     // Populate filter dropdown only if it's empty
-    if (filterSelect && filterSelect.options.length <= 1) {
+    if (filterSelect && (!state.guildData.permissions || filterSelect.options.length <= 1)) {
         filterSelect.innerHTML = '<option value="all">Tüm İzinler</option>';
         const permissions = await api.getPermissions();
         state.updateGuildData({ permissions });

@@ -27,6 +27,7 @@ export const api = {
     getGuildModLogs: (guildId) => fetchJSON(`/api/guild/${guildId}/mod-logs`),
     getGuildLeaderboard: (guildId) => fetchJSON(`/api/guild/${guildId}/leaderboard`),
     getGuildBackups: (guildId) => fetchJSON(`/api/guild/${guildId}/backups`),
+    getCustomCommands: (guildId) => fetchJSON(`/api/guild/${guildId}/custom-commands`), // YENİ
     getPermissions: () => fetchJSON('/api/permissions'),
     getAuditLogEvents: () => fetchJSON('/api/audit-log-events'),
 
@@ -65,5 +66,25 @@ export const api = {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(backupData)
+    }),
+    // YENİ EKLENEN FONKSİYON
+    savePluginOrder: (guildId, gridId, order) => fetchJSON(`/api/guild/${guildId}/plugin-order`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ gridId, order })
+    }),
+    // YENİ: Özel Komutlar API Fonksiyonları
+    addCustomCommand: (guildId, commandData) => fetchJSON(`/api/guild/${guildId}/custom-commands`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(commandData)
+    }),
+    updateCustomCommand: (guildId, commandId, commandData) => fetchJSON(`/api/guild/${guildId}/custom-commands/${commandId}`, {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(commandData)
+    }),
+    deleteCustomCommand: (guildId, commandId) => fetchJSON(`/api/guild/${guildId}/custom-commands/${commandId}`, {
+        method: 'DELETE',
     }),
 };

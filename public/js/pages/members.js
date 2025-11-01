@@ -25,7 +25,7 @@ function displayMembers(members) {
             </td>
             <td>${member.id}</td>
             <td style="text-align: center;">
-                <button class="role-action-btn edit edit-member-roles-btn" data-member-id="${member.id}">
+                <button class="action-btn edit edit-member-roles-btn" data-member-id="${member.id}">
                     Rolleri Düzenle
                 </button>
             </td>

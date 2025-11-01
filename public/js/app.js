@@ -9,44 +9,65 @@ import { initInvitesPage } from './pages/invites.js'; // Bu satır zaten varsa, 
 import { initLeaderboardPage } from './pages/leaderboard.js';
 import { initAuditLogPage } from './pages/audit-log.js';
 import { initModLogPage } from './pages/mod-log.js';
+import { initCustomCommandsPage } from './pages/customCommands.js'; // YENİ
 import { initBackupsPage } from './pages/backups.js';
+import { initPluginsPage, setupPluginPageListeners } from './pages/plugins.js';
 
-// Şimdilik sayfa mantıklarını burada tutuyoruz, daha sonra bunları da ayırabiliriz.
-const pages = {
-    'dashboard-page': { init: initDashboardPage },
-    'roles-page': { init: initRolesPage },
-    'members-page': { init: initMembersPage },
-    'stats-page': { init: initStatsPage },
-    'invites-page': { init: initInvitesPage },
-    'leaderboard-page': { init: initLeaderboardPage },
-    'audit-log-page': { init: initAuditLogPage },
-    'mod-log-page': { init: initModLogPage },
-    'backups-page': { init: initBackupsPage },
+const pageInitializers = {
+    'dashboard-page': initDashboardPage,
+    'roles-page': initRolesPage,
+    'members-page': initMembersPage, // Hata düzeltildi: initRolesPage -> initMembersPage
+    'stats-page': initStatsPage,
+    'invites-page': initInvitesPage,
+    'leaderboard-page': initLeaderboardPage,
+    'audit-log-page': initAuditLogPage,
+    'mod-log-page': initModLogPage,
+    'custom-commands-page': initCustomCommandsPage,
+    'backups-page': initBackupsPage,
+    'plugins-page': initPluginsPage,
 };
 
-async function switchPage(pageId) {
-    // Sayfa değiştirirken kaydedilmemiş değişiklikler varsa uyar
+async function switchPage(pageId, force = false) {
     const hasUnsaved = !!document.querySelector('.save-button.has-unsaved-changes');
-    if (hasUnsaved) {
+    if (hasUnsaved && !force) {
         const confirmed = await ui.showConfirmModal('Kaydedilmemiş Değişiklikler', 'Kaydedilmemiş değişiklikleriniz var. Yine de devam etmek istiyor musunuz? Değişiklikleriniz kaybolacak.');
         if (!confirmed) return;
     }
 
+    // Tüm sayfaları gizle
     document.querySelectorAll('.page-content').forEach(page => page.style.display = 'none');
+    
+    // Eklenti sayfasının özel kapsayıcılarını da gizle
+    document.querySelectorAll('.plugins-grid-container').forEach(container => {
+        container.style.display = 'none';
+    });
+
+
+    // Tüm navigasyon linklerinden 'active' sınıfını kaldır
     document.querySelectorAll('.nav-link').forEach(link => link.classList.remove('active'));
 
     const targetPage = document.getElementById(pageId);
     const targetLink = document.querySelector(`.nav-link[data-page="${pageId}"]`);
 
-    if (targetPage) targetPage.style.display = 'block';
-    if (targetLink) targetLink.classList.add('active');
+    if (targetPage) {
+        // Sadece hedef sayfayı göster
+        targetPage.style.display = 'block';
 
-    // İlgili sayfanın başlatma fonksiyonunu çağır
-    if (pages[pageId] && pages[pageId].init) {
-        try {
-            await pages[pageId].init();
-        } catch (error) {
-            ui.showToast(`'${pageId}' sayfası yüklenirken hata: ${error.message}`, 'error');
+        // Eğer hedef sayfa eklentiler sayfasıysa, onun özel kapsayıcılarını da göster
+        if (pageId === 'plugins-page') {
+            document.querySelectorAll('.plugins-grid-container').forEach(container => {
+                container.style.display = 'block';
+            });
+        }
+
+        if (targetLink) {
+            targetLink.classList.add('active'); // İlgili menü öğesini aktif yap
+        }
+
+        // Sayfanın içerik yükleme fonksiyonunu çalıştır
+        const initializer = pageInitializers[pageId];
+        if (initializer) {
+            await initializer();
         }
     }
 }
@@ -95,6 +116,16 @@ function updatePluginCardsUI() {
                 input.value = savedValue;
             }
         });
+
+        // YENİ: Resim önizlemelerini ayarla
+        const welcomeBg = settings.welcome?.welcomeBackgroundImage;
+        const goodbyeBg = settings.welcome?.goodbyeBackgroundImage;
+        const welcomePreview = document.getElementById('welcome-bg-preview');
+        const goodbyePreview = document.getElementById('goodbye-bg-preview');
+        if (welcomeBg && welcomePreview) { welcomePreview.src = `/uploads/${welcomeBg}`; welcomePreview.style.display = 'block'; }
+        else if (welcomePreview) { welcomePreview.style.display = 'none'; }
+        if (goodbyeBg && goodbyePreview) { goodbyePreview.src = `/uploads/${goodbyeBg}`; goodbyePreview.style.display = 'block'; }
+        else if (goodbyePreview) { goodbyePreview.style.display = 'none'; }
     });
 
     // Özel liste render fonksiyonlarını çağır (ui.js'den gelenler)
@@ -122,8 +153,8 @@ async function loadGuildData(guildId) {
         ]);
         state.updateGuildData({ settings, channels, roles });
         updatePluginCardsUI(); // EKLENEN SATIR: Arayüzü gelen verilerle doldur.
-        console.log("Sunucu verileri yüklendi", state.guildData);
-        switchPage('dashboard-page');
+        console.log("Sunucu verileri yüklendi ve arayüz güncellendi.", state.guildData);
+        await switchPage('dashboard-page', true); // Sayfayı zorla değiştir (kaydedilmemiş değişiklik uyarısı olmadan)
     } catch (error) {
         ui.showToast(`Sunucu verileri yüklenemedi: ${error.message}`, 'error');
         showServerSelector();
@@ -208,46 +239,6 @@ function setupEventListeners() {
         }
     });
 
-    // Ayar girdilerinde değişiklik olduğunda kaydetme butonunu işaretle
-    const handleSettingChange = (e) => {
-        const settingInput = e.target.closest('[data-setting]');
-        if (settingInput && settingInput.closest('.plugin-card')) {
-            ui.markUnsavedChanges(settingInput);
-        }
-    };
-    document.addEventListener('input', handleSettingChange);
-    document.addEventListener('change', (e) => {
-        handleSettingChange(e);
-        // Eklenti enable/disable switch'i
-        if (e.target.classList.contains('enable-toggle')) {
-            e.target.closest('.plugin-card, .sub-plugin')?.classList.toggle('enabled', e.target.checked);
-        }
-    });
-
-    // "Tümünü Kaydet" butonu
-    const saveAllBtn = document.getElementById('save-all-changes-btn');
-    if (saveAllBtn) {
-        saveAllBtn.addEventListener('click', async () => {
-            const unsavedButtons = document.querySelectorAll('.save-button.has-unsaved-changes');
-            if (unsavedButtons.length === 0) {
-                ui.showToast('Kaydedilecek değişiklik yok.', 'warning');
-                return;
-            }
-            saveAllBtn.disabled = true;
-            saveAllBtn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Kaydediliyor...';
-            const savePromises = Array.from(unsavedButtons).map(button => handleSave(button));
-            try {
-                await Promise.all(savePromises);
-                ui.showToast('Tüm değişiklikler başarıyla kaydedildi!', 'success');
-            } catch (error) {
-                ui.showToast('Tüm ayarlar kaydedilirken bir hata oluştu.', 'error');
-            } finally {
-                saveAllBtn.disabled = false;
-                saveAllBtn.textContent = 'Tümünü Kaydet';
-            }
-        });
-    }
-
     // Ayarları içe/dışa aktarma ve sıfırlama
     document.addEventListener('click', async (e) => {
         if (e.target.closest('.reset-all-settings-btn')) {
@@ -285,143 +276,33 @@ function setupEventListeners() {
         }
     });
 
-    // --- EKLENTİ KARTI İÇİNDEKİ BUTON OLAYLARI ---
-    document.addEventListener('click', (e) => {
-        const target = e.target;
+    // YENİ: Resim yükleme olay dinleyicisi
+    document.addEventListener('change', async (e) => {
+        if (e.target.classList.contains('image-upload-input')) {
+            const fileInput = e.target;
+            const file = fileInput.files[0];
+            if (!file) return;
 
-        // Listeye öğe ekleme butonları
-        if (target.id === 'add-protected-channel-btn') {
-            const select = document.getElementById('channel-to-protect-select');
-            const list = document.getElementById('protected-channels-list');
-            const idToAdd = select.value;
-            if (!idToAdd || list.querySelector(`.remove-item-btn[data-id="${idToAdd}"]`)) return;
-            const name = select.options[select.selectedIndex].text;
-            const listItem = document.createElement('div');
-            listItem.className = 'protected-item';
-            listItem.innerHTML = `<span>#${name}</span><button type="button" class="remove-item-btn" data-id="${idToAdd}" data-type="protected-channel">&times;</button>`;
-            list.appendChild(listItem);
-            if (select.selectedIndex > 0) select.options[select.selectedIndex].disabled = true;
-            select.selectedIndex = 0;
-            ui.markUnsavedChanges(target);
-        } else if (target.id === 'add-antispam-role-btn') {
-            const select = document.getElementById('antispam-role-select');
-            const list = document.getElementById('antispam-allowed-roles-list');
-            const idToAdd = select.value;
-            if (!idToAdd || list.querySelector(`.remove-item-btn[data-id="${idToAdd}"]`)) return;
-            const role = state.guildData.roles.find(r => r.id === idToAdd);
-            if (role) {
-                const listItem = document.createElement('div');
-                listItem.className = 'protected-item';
-                listItem.innerHTML = `<span><span class="role-color-dot" style="background-color: ${role.color};"></span>@${role.name}</span><button type="button" class="remove-item-btn" data-id="${idToAdd}" data-type="antispam-role">&times;</button>`;
-                list.appendChild(listItem);
-                if (select.selectedIndex > 0) select.options[select.selectedIndex].disabled = true;
-                select.selectedIndex = 0;
-                ui.markUnsavedChanges(target);
+            const imageType = fileInput.dataset.type; // 'welcome' veya 'goodbye'
+            const formData = new FormData();
+            formData.append('backgroundImage', file);
+
+            try {
+                const response = await fetch(`/api/guild/${state.selectedGuildId}/upload-welcome-image/${imageType}`, {
+                    method: 'POST',
+                    body: formData,
+                });
+                const result = await response.json();
+                if (!response.ok) throw new Error(result.error);
+
+                ui.showToast('Resim başarıyla yüklendi ve kaydedildi!', 'success');
+                document.getElementById(`${imageType}-bg-preview`).src = result.filePath;
+                document.getElementById(`${imageType}-bg-preview`).style.display = 'block';
+            } catch (error) {
+                ui.showToast(`Resim yüklenemedi: ${error.message}`, 'error');
             }
-        } else if (target.id === 'add-invite-reward-btn') {
-            const countInput = document.getElementById('new-reward-count');
-            const roleSelect = document.getElementById('new-reward-role-select');
-            const list = document.getElementById('invite-rewards-list');
-            const count = parseInt(countInput.value, 10);
-            const roleId = roleSelect.value;
-            const roleName = roleSelect.options[roleSelect.selectedIndex].text;
-
-            if (!count || count < 1 || !roleId || list.querySelector(`.remove-item-btn[data-id="${roleId}"]`)) {
-                ui.showToast('Lütfen geçerli bir davet sayısı ve listede olmayan bir rol seçin.', 'warning');
-                return;
-            }
-            const item = document.createElement('div');
-            item.className = 'protected-item';
-            item.innerHTML = `<span><strong>${count}</strong> davet → @${roleName}</span><button type="button" class="remove-item-btn" data-id="${roleId}" data-type="invite-reward">&times;</button>`;
-            list.appendChild(item);
-            // Sıralama ve input temizleme işlemleri eklenebilir.
-            ui.markUnsavedChanges(target);
-        }
-
-        // Listeden öğe silme butonu (remove-item-btn)
-        const removeBtn = target.closest('.remove-item-btn');
-        if (removeBtn) {
-            const idToRemove = removeBtn.dataset.id;
-            // İlgili select menüsündeki opsiyonu tekrar aktif etme mantığı buraya eklenebilir.
-            removeBtn.parentElement.remove();
-            ui.markUnsavedChanges(removeBtn);
         }
     });
-
-    // --- BİLET SİSTEMİ OLAYLARI ---
-    const addTicketTopicBtn = document.getElementById('add-ticket-topic-btn');
-    if (addTicketTopicBtn) {
-        addTicketTopicBtn.addEventListener('click', () => ui.openTicketTopicModal(state.guildData));
-    }
-
-    const ticketTopicModal = document.getElementById('ticket-topic-modal');
-    if (ticketTopicModal) {
-        ticketTopicModal.addEventListener('click', (e) => {
-            if (e.target === ticketTopicModal || e.target.id === 'ticket-topic-modal-cancel') {
-                ticketTopicModal.style.display = 'none';
-            }
-        });
-    }
-
-    const ticketTopicForm = document.getElementById('ticket-topic-form');
-    if (ticketTopicForm) {
-        ticketTopicForm.addEventListener('submit', async (event) => {
-            event.preventDefault();
-            const form = event.target;
-            const topicData = {
-                id: form.querySelector('#ticket-topic-id').value,
-                label: form.querySelector('#ticket-topic-label').value.trim(),
-                description: form.querySelector('#ticket-topic-description').value.trim(),
-                emoji: form.querySelector('#ticket-topic-emoji').value.trim(),
-                categoryId: form.querySelector('#ticket-topic-category').value || null,
-                supportRoleId: form.querySelector('#ticket-topic-support-role').value || null,
-            };
-
-            if (!topicData.label) {
-                ui.showToast('Konu başlığı boş bırakılamaz.', 'error');
-                return;
-            }
-
-            const ticketSettings = state.guildData.settings.tickets;
-            if (!ticketSettings.topics) ticketSettings.topics = [];
-
-            const existingIndex = ticketSettings.topics.findIndex(t => t.id === topicData.id);
-            if (existingIndex > -1) {
-                ticketSettings.topics[existingIndex] = topicData;
-            } else {
-                ticketSettings.topics.push(topicData);
-            }
-            ui.renderTicketTopicsList(ticketSettings.topics);
-            ui.markUnsavedChanges(form);
-            ticketTopicModal.style.display = 'none';
-            ui.showToast('Konu kaydedildi. Değişiklikleri kalıcı hale getirmek için "Ayarları Kaydet" butonuna tıklayın.', 'success');
-        });
-    }
-
-    const ticketTopicsList = document.getElementById('ticket-topics-list');
-    if (ticketTopicsList) {
-        ticketTopicsList.addEventListener('click', async (e) => {
-            const editBtn = e.target.closest('.edit-ticket-topic-btn');
-            const deleteBtn = e.target.closest('.delete-ticket-topic-btn');
-
-            if (editBtn) {
-                const listItem = editBtn.closest('.list-item');
-                if (listItem && listItem.dataset.topic) ui.openTicketTopicModal(state.guildData, JSON.parse(listItem.dataset.topic));
-            } else if (deleteBtn) {
-                const listItem = deleteBtn.closest('.list-item');
-                if (listItem && listItem.dataset.topic) {
-                    const topicData = JSON.parse(listItem.dataset.topic);
-                    const confirmed = await ui.showConfirmModal('Konuyu Sil', `'${topicData.label}' konusunu silmek istediğinizden emin misiniz?`);
-                    if (confirmed) {
-                        state.guildData.settings.tickets.topics = state.guildData.settings.tickets.topics.filter(t => t.id !== topicData.id);
-                        ui.renderTicketTopicsList(state.guildData.settings.tickets.topics);
-                        ui.markUnsavedChanges(listItem);
-                        ui.showToast('Konu silindi. Değişiklikleri kalıcı hale getirmek için "Ayarları Kaydet" butonuna tıklayın.', 'success');
-                    }
-                }
-            }
-        });
-    }
 
 }
 
@@ -480,7 +361,9 @@ async function handleSave(button) {
 }
 
 async function init() {
+    // Olay dinleyicilerini her zaman en başta kur, böylece sayfa yüklendiği andan itibaren aktif olurlar.
     setupEventListeners();
+
     const lastGuildId = localStorage.getItem('selectedGuildId');
     if (lastGuildId) {
         state.selectedGuildId = lastGuildId;
@@ -488,7 +371,7 @@ async function init() {
         ui.elements.currentServerName.textContent = localStorage.getItem('selectedGuildName');
         ui.elements.mainContent.style.display = 'block';
         ui.elements.modal.style.display = 'none'; // EKRANI GİZLEMEK İÇİN EKLENEN SATIR
-        await loadGuildData(lastGuildId);
+        await loadGuildData(lastGuildId); // Sunucu verilerinin yüklenmesini bekle
     } else {
         await showServerSelector();
     }
