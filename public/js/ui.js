@@ -10,6 +10,7 @@ export const elements = {
     currentServerName: document.getElementById('current-server-name'),
     logoutBtn: document.getElementById('logout-btn'),
     sidebarNav: document.querySelector('.sidebar-nav'),
+    unsavedChangesBar: document.getElementById('unsaved-changes-bar'), // EKLENDİ: Kaydedilmemiş değişiklikler çubuğu
     addServerBtn: document.getElementById('add-server-btn'),
 };
 

@@ -23,5 +23,10 @@ export const state = {
 
     updateGuildData(newData) {
         this.guildData = { ...this.guildData, ...newData };
+    },
+
+    // YENİ: Belirli bir veri türünün yüklenip yüklenmediğini kontrol eder.
+    isDataLoaded(key) {
+        return this.guildData[key] && (!Array.isArray(this.guildData[key]) || this.guildData[key].length > 0);
     }
 };

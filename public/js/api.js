@@ -1,13 +1,17 @@
 async function fetchJSON(url, options = {}) {
     try {
         const response = await fetch(url, options);
-        const data = await response.json();
         if (!response.ok) {
+            let data;
+            try {
+                data = await response.json(); // Hata mesajını JSON olarak almayı dene
+            } catch (jsonError) {
+                data = { error: `HTTP error! status: ${response.status}` }; // JSON ayrıştırma başarısız olursa genel bir hata oluştur
+            }
             throw new Error(data.error || `HTTP error! status: ${response.status}`);
         }
-        return data;
+        return await response.json();
     } catch (error) {
-        console.error(`API isteği hatası (${url}):`, error);
         throw error; // Hatanın daha üst katmanlarda yakalanabilmesi için tekrar fırlat
     }
 }

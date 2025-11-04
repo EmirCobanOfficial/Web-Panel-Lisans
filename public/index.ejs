@@ -74,8 +74,8 @@
         <div id="unsaved-changes-bar" class="unsaved-changes-bar">
           <span
             >Kaydedilmemiş değişiklikleriniz var. Sayfadan ayrılmadan önce
-            kaydettiğinizden emin olun.</span
-          ><button id="save-all-changes-btn">Tümünü Kaydet</button>
+            kaydettiğinizden emin olun.</span >
+            <button id="save-all-changes-btn" data-action="save-all">Tümünü Kaydet</button>
         </div>
 
         <!-- Page 0: Dashboard -->
@@ -103,13 +103,13 @@
             <header class="main-header">
               <h2>🛡️ Moderasyon & Güvenlik</h2>
               <div class="header-controls">
-                <button class="import-settings-btn header-action-btn">
+                <button data-action="import-settings" class="header-action-btn">
                   <i class="fa-solid fa-upload"></i> Ayarları İçe Aktar
                 </button>
-                <button class="export-settings-btn header-action-btn">
+                <button data-action="export-settings" class="header-action-btn">
                   <i class="fa-solid fa-download"></i> Ayarları Dışa Aktar
                 </button>
-                <button class="reset-all-settings-btn header-action-btn danger">
+                <button data-action="reset-all-settings" class="header-action-btn danger">
                   <i class="fa-solid fa-trash-arrow-up"></i> Tüm Ayarları Sıfırla
                 </button>
               </div>
@@ -298,13 +298,13 @@
             <header class="main-header">
               <h2>👥 Yönetim & Takip</h2>
               <div class="header-controls">
-                <button class="import-settings-btn header-action-btn">
+                <button data-action="import-settings" class="header-action-btn">
                   <i class="fa-solid fa-upload"></i> Ayarları İçe Aktar
                 </button>
-                <button class="export-settings-btn header-action-btn">
+                <button data-action="export-settings" class="header-action-btn">
                   <i class="fa-solid fa-download"></i> Ayarları Dışa Aktar
                 </button>
-                <button class="reset-all-settings-btn header-action-btn danger">
+                <button data-action="reset-all-settings" class="header-action-btn danger">
                   <i class="fa-solid fa-trash-arrow-up"></i> Tüm Ayarları Sıfırla
                 </button>
               </div>
@@ -319,7 +319,6 @@
                 <div class="plugin-header">
                   <i class="fa-solid fa-user-plus"></i>
                   <h3>Davet Takipçisi</h3>
-                  <span class="new-badge">YENİ</span>
                   <i class="fa-solid fa-chevron-down collapse-icon"></i>
                   <label class="switch">
                     <input

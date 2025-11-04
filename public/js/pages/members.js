@@ -130,8 +130,8 @@ export async function initMembersPage() {
         const members = await api.getGuildMembers(state.selectedGuildId);
         state.updateGuildData({ members });
         displayMembers(members);
-    } catch (error) {
-        showToast(`Üyeler alınamadı: ${error.message}`, 'error');
+   } catch (error) {
+        showToast(`Üyeler alınamadı: ${error}`, 'error');
         membersBody.innerHTML = `<tr><td colspan="3" style="text-align: center; color: var(--red);">${error.message}</td></tr>`;
     }
 

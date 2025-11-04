@@ -16,7 +16,7 @@ import { initPluginsPage, setupPluginPageListeners } from './pages/plugins.js';
 const pageInitializers = {
     'dashboard-page': initDashboardPage,
     'roles-page': initRolesPage,
-    'members-page': initMembersPage, // Hata düzeltildi: initRolesPage -> initMembersPage
+    'members-page': initMembersPage,
     'stats-page': initStatsPage,
     'invites-page': initInvitesPage,
     'leaderboard-page': initLeaderboardPage,
@@ -66,8 +66,16 @@ async function switchPage(pageId, force = false) {
 
         // Sayfanın içerik yükleme fonksiyonunu çalıştır
         const initializer = pageInitializers[pageId];
-        if (initializer) {
-            await initializer();
+        if (initializer) { // Önbellek kontrolü
+            const dataKey = pageId.split('-')[0]; // 'members-page' -> 'members'
+            // 'members', 'stats', 'summary' (dashboard için) gibi anahtar veriler zaten yüklüyse, tekrar yükleme.
+            // Eklentiler ve roller gibi temel veriler her zaman yüklü kabul edilir.
+            const alwaysReload = ['plugins', 'roles', 'custom-commands', 'backups', 'stats', 'dashboard'];
+            if (force || alwaysReload.includes(dataKey) || !state.isDataLoaded(dataKey)) {
+                await initializer();
+            } else {
+                console.log(`[Cache] '${pageId}' için veriler zaten yüklü, API isteği atlanıyor.`);
+            }
         }
     }
 }
@@ -213,70 +221,119 @@ function setupEventListeners() {
         loadGuildData(card.dataset.guildId);
     });
 
-    ui.elements.logoutBtn.addEventListener('click', () => {
-        window.location.href = '/auth/logout';
-    });
-
     ui.elements.currentServerHeader.addEventListener('click', () => {
         // Kullanıcının sunucu değiştirmesine izin ver
         showServerSelector();
     });
 
-    // --- EKSİK OLAN GENEL OLAY DİNLEYİCİLERİ ---
+    // =================================================================
+    // MERKEZİ OLAY YÖNETİCİSİ (GLOBAL EVENT DELEGATION)
+    // =================================================================
+    document.body.addEventListener('click', async (e) => {
+        const target = e.target;
+        const actionTarget = target.closest('[data-action]');
+        if (!actionTarget) return;
 
-    // Tek bir eklenti ayarını kaydetme
-    document.addEventListener('click', async (e) => {
-        const saveBtn = e.target.closest('.save-button');
-        if (saveBtn) {
-            await handleSave(saveBtn);
+        const action = actionTarget.dataset.action;
+
+        switch (action) {
+            // YENİ: Çıkış yapma butonu için data-action eklendi
+            case 'logout':
+                window.location.href = '/auth/logout';
+                break;
+
+            case 'logout':
+                window.location.href = '/auth/logout';
+                break;
+
+            case 'save-all': {
+                const saveButtons = document.querySelectorAll('.save-button.has-unsaved-changes');
+                console.log(`[Save All] Found ${saveButtons.length} settings to save.`);
+                ui.showToast(`Tüm ayarlar kaydediliyor... (${saveButtons.length} adet)`, 'info');
+                const savePromises = Array.from(saveButtons).map(btn => saveSettings(btn));
+                try {
+                    await Promise.all(savePromises);
+                    ui.showToast('Tüm değişiklikler başarıyla kaydedildi!', 'success');
+                } catch (error) {
+                    console.error("Toplu kaydetme sırasında hata:", error);
+                    ui.showToast('Bazı ayarlar kaydedilirken bir hata oluştu.', 'error');
+                }
+                break;
+            }
+
+            case 'save-plugin':
+                await saveSettings(actionTarget);
+                break;
+
+            case 'collapse-plugin':
+                if (!target.closest('.switch')) {
+                    actionTarget.closest('.plugin-card')?.classList.toggle('collapsed');
+                }
+                break;
+
+            case 'reset-all-settings': {
+                const confirmed = await ui.showConfirmModal('Tüm Ayarları Sıfırla', 'Bu sunucu için yapılandırılmış TÜM eklenti ayarlarını varsayılan değerlerine sıfırlamak istediğinizden emin misiniz? Bu işlem geri alınamaz.');
+                if (!confirmed) return;
+                try {
+                    await api.resetAllSettings(state.selectedGuildId);
+                    ui.showToast('Tüm ayarlar başarıyla sıfırlandı. Panel yenileniyor...', 'success');
+                    setTimeout(() => loadGuildData(state.selectedGuildId), 1500);
+                } catch (error) {
+                    ui.showToast(`Hata: ${error.message}`, 'error');
+                }
+                break;
+            }
+
+            case 'export-settings': {
+                const settingsToExport = state.guildData.settings;
+                if (!settingsToExport || Object.keys(settingsToExport).length === 0) {
+                    ui.showToast('Dışa aktarılacak ayar bulunamadı.', 'warning');
+                    return;
+                }
+                const dataStr = JSON.stringify(settingsToExport, null, 4);
+                const blob = new Blob([dataStr], { type: 'application/json' });
+                const url = URL.createObjectURL(blob);
+                const a = document.createElement('a');
+                a.href = url;
+                a.download = `sunucu-ayarlari-${state.selectedGuildId}.json`;
+                document.body.appendChild(a);
+                a.click();
+                document.body.removeChild(a);
+                URL.revokeObjectURL(url);
+                break;
+            }
+
+            case 'import-settings':
+                document.getElementById('import-settings-input')?.click();
+                break;
         }
     });
-    document.addEventListener('click', (e) => {
-        // Eklenti kartlarını daralt/genişlet
-        const header = e.target.closest('.plugin-header');
-        if (header && !e.target.closest('.switch')) {
-            header.closest('.plugin-card')?.classList.toggle('collapsed');
-        }
-    });
 
-    // Ayarları içe/dışa aktarma ve sıfırlama
-    document.addEventListener('click', async (e) => {
-        if (e.target.closest('.reset-all-settings-btn')) {
-            const confirmed = await ui.showConfirmModal('Tüm Ayarları Sıfırla', 'Bu sunucu için yapılandırılmış TÜM eklenti ayarlarını varsayılan değerlerine sıfırlamak istediğinizden emin misiniz? Bu işlem geri alınamaz.');
-            if (!confirmed) return;
+    // Dosya seçildiğinde içe aktarma işlemini tetikle
+    document.getElementById('import-settings-input')?.addEventListener('change', async (e) => {
+        const file = e.target.files[0];
+        if (!file) return;
+
+        const reader = new FileReader();
+        reader.onload = async (event) => {
             try {
-                await api.resetAllSettings(state.selectedGuildId);
-                ui.showToast('Tüm ayarlar başarıyla sıfırlandı. Panel yenileniyor...', 'success');
+                const newSettings = JSON.parse(event.target.result);
+                const confirmed = await ui.showConfirmModal('Ayarları İçe Aktar', 'Mevcut tüm ayarlarınızın üzerine bu dosyadaki ayarların yazılmasını onaylıyor musunuz? Bu işlem geri alınamaz.');
+                if (!confirmed) return;
+
+                await api.importSettings(state.selectedGuildId, newSettings);
+                ui.showToast('Ayarlar başarıyla içe aktarıldı. Panel yenileniyor...', 'success');
                 setTimeout(() => loadGuildData(state.selectedGuildId), 1500);
             } catch (error) {
-                ui.showToast(`Hata: ${error.message}`, 'error');
+                ui.showToast(`İçe aktarma hatası: ${error.message}`, 'error');
+            } finally {
+                // Aynı dosyayı tekrar seçebilmek için input'u sıfırla
+                e.target.value = '';
             }
-        }
-
-        if (e.target.closest('.export-settings-btn')) {
-            const settingsToExport = state.guildData.settings;
-            if (!settingsToExport || Object.keys(settingsToExport).length === 0) {
-                ui.showToast('Dışa aktarılacak ayar bulunamadı.', 'warning');
-                return;
-            }
-            const dataStr = JSON.stringify(settingsToExport, null, 4);
-            const blob = new Blob([dataStr], { type: 'application/json' });
-            const url = URL.createObjectURL(blob);
-            const a = document.createElement('a');
-            a.href = url;
-            a.download = `sunucu-ayarlari-${state.selectedGuildId}.json`;
-            document.body.appendChild(a);
-            a.click();
-            document.body.removeChild(a);
-            URL.revokeObjectURL(url);
-        }
-
-        if (e.target.closest('.import-settings-btn')) {
-            document.getElementById('import-settings-input')?.click();
-        }
+        };
+        reader.readAsText(file);
     });
 
-    // YENİ: Resim yükleme olay dinleyicisi
     document.addEventListener('change', async (e) => {
         if (e.target.classList.contains('image-upload-input')) {
             const fileInput = e.target;
@@ -306,7 +363,7 @@ function setupEventListeners() {
 
 }
 
-async function handleSave(button) {
+export async function saveSettings(button) {
     const card = button.closest('.plugin-card');
     if (!card) return;
     const moduleName = card.dataset.module;

@@ -1,6 +1,7 @@
 import { api } from '../api.js';
 import { state } from '../state.js';
 import * as ui from '../ui.js';
+import { saveSettings } from '../app.js';
 
 function initializeSortable(gridId) {
     const grid = document.getElementById(gridId);
@@ -34,7 +35,7 @@ export function setupPluginPageListeners() {
         const header = target.closest('.plugin-header');
         if (header && !target.closest('.switch')) {
             header.closest('.plugin-card')?.classList.toggle('collapsed');
-        }
+        } // Bu kısım app.js'e taşındı, ancak burada kalması zararsızdır.
 
         // Listeye öğe ekleme butonları
         if (target.id === 'add-protected-channel-btn') {
@@ -95,12 +96,6 @@ export function setupPluginPageListeners() {
         if (settingInput) {
             ui.markUnsavedChanges(settingInput);
         }
-    });
-
-    // Tek bir eklenti ayarını kaydetme
-    pluginsPage.addEventListener('click', async (e) => {
-        const saveBtn = e.target.closest('.save-button');
-        if (saveBtn) await handleSave(saveBtn);
     });
 
     pluginsPage.dataset.listenerAttached = 'true'; // Dinleyicinin kurulduğunu işaretle.
